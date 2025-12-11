@@ -96,6 +96,13 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit, the obfuscated file is already up-to-date."
           else
-            git commit -m "部署用这个"
-            git push
-          fi
+             # 提交更改，并在消息中添加 [skip ci] 以免触发无限循环构建
+            git commit -m "Auto generate obfuscated script [skip ci]"
+            
+            # === 关键修复步骤 ===
+            # 在推送前，先拉取远程最新代码并变基（Rebase），解决冲突
+            git pull --rebase origin main
+            
+            # 推送到远程 main 分支
+            git push origin main
+
